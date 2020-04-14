@@ -1,0 +1,76 @@
+"""SOURCE: ImageNet Classification with Deep Convolutional Neural Networks """
+saturating nonlinear function (sigmoid and tanh) vs non-saturating nonlinear functions (relu): 
+ - tradianal use sigmoid or tanh
+ - training time much shorter with relu
+ - abs(tanh) can help against overfitting
+ 
+Overlapping Pooling can help to prevent overfitting.
+
+Questions: 
+ - Local Response Normalization?
+
+
+
+
+""" SORUCE: https://github.com/vdumoulin/conv_arithmetic/blob/master/README.md"""
+Padding makes the convolution outcome +2 in width and hight by adding zeros (for example) outside the image
+
+Stride is how many pixels you skip between convolutions. Stride 1 means (generly) each pixel in the input has a pixel in the output. 
+
+Dilation is how many pixels are skipped in a convolutions. So Dilation of 2 means for a 3x3 convolution that an area of 5x5 is used where the "even indexes" are not used.
+
+
+
+"""SORCE: tips""""
+Softmax at the end of the network works better then sigmoid.
+
+###############################################
+nn.Sequential is easy to use if you do not want to write a class.
+
+# Example of using Sequential with OrderedDict
+model = nn.Sequential(OrderedDict([
+          ('conv1', nn.Conv2d(1,20,5)),
+          ('relu1', nn.ReLU()),
+          ('conv2', nn.Conv2d(20,64,5)),
+          ('relu2', nn.ReLU())
+        ]))
+
+Question: All parts of the network must be part of the nn model not F.How do you connect weights then?
+##################################################
+
+
+1) I found that you use sigmoid activations function in PCA. Why is it so? What do you use it for?
+	Answer: images has values between 0 and 1.
+
+2) You also use sigmoid in an autoencoder. Why sigmoid? why not ReLU? What do you expect to work better for deep models, i.e. models with very many layers. 
+	Answer: sigmoid can only learn "one thing" So each node reprents a feature Yes or No. With Relu features get a number. No reason just that sigmoid or tanh is used more often in lectures. 
+
+3) I recommend you to use nn.Sequential when it is possible. It makes code more readable and easier to fix
+
+4) Try to create PCA with dimensionality of 2 in the middle. Then compress the whole MNIST dataset with the PCA. Consider these 2 components as x and y coordinates and draw the dataset on a plane. use plt.scatter for these needs.
+colorize the points such that all classes have different colors. 
+
+5) repeat the same for an autoencoder. 
+
+6) What do you see? is it possible to linearly separate classes just by using 2 components from PCA? 2 components from the autoencoder?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
