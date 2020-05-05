@@ -12,7 +12,7 @@ class NICE(nn.Module):
         super().__init__()
         self.shift = net
 
-    def forward(self, x, log_p):
+    def forward(self, x, log_p=0.0):
         C = x.size(1) // 2
         x1, x2 = x.split(C, 1)
         x1 = x1.contiguous()
@@ -21,7 +21,7 @@ class NICE(nn.Module):
         x2 = x2 + self.shift(x1)
         return torch.cat([x2, x1], 1), log_p
 
-    def inverse(self, x, log_p):
+    def inverse(self, x, log_p=0.0):
         C = x.size(1) // 2
         x2, x1 = x.split(C, 1)
         x1 = x1.contiguous()
@@ -44,7 +44,7 @@ class Real_NVP(nn.Module):
         self.scale_shift = nn.Sequential(*net,
             nn2.Conv2dZeros(hidden_channels, in_channels * 2))
 
-    def forward(self, x, log_p):
+    def forward(self, x, log_p=0.0):
         C = x.size(1) // 2
         x1, x2 = x.split(C, 1)
         x1 = x1.contiguous()
@@ -57,7 +57,7 @@ class Real_NVP(nn.Module):
         log_det = torch.log(scale).mean(0).sum()
         return torch.cat([x1, x2], dim=1), log_p + log_det
 
-    def inverse(self, x, log_p):
+    def inverse(self, x, log_p=0.0):
         C = x.size(1) // 2
         x1, x2 = x.split(C, dim=1)
         x1 = x1.contiguous()
