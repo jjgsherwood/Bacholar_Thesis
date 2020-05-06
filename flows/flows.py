@@ -29,7 +29,6 @@ class iSequential(nn.Sequential):
 
 
 class Split(nn.Module):
-
     def __init__(self, in_features, out_features):
         assert in_features > out_features
         super().__init__()
@@ -41,7 +40,7 @@ class Split(nn.Module):
         x = x[:, :self.out_features]
         z_mu = torch.zeros_like(z, device=x.device)
         z_dist = Normal(z_mu, 1)
-        log_p_z = z_dist.log_prob(z).view(z.size(0), -1).sum(1)
+        log_p_z = z_dist.log_prob(z).mean(0).sum()
         return x, log_p + log_p_z
 
     def inverse(self, x, log_p=0.0):
@@ -51,7 +50,7 @@ class Split(nn.Module):
         z_dist = Normal(z_mu, 1)
         z = z_dist.sample()
         x = torch.cat([x, z], 1)
-        log_p_z = z_dist.log_prob(z).view(z.size(0), -1).sum(1)
+        log_p_z = z_dist.log_prob(z).mean(0).sum()
         return x, log_p - log_p_z
 
     def extra_repr(self):

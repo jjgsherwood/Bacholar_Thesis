@@ -48,9 +48,14 @@ if __name__ == "__main__":
     if args.dataset == 'mnist':
         train_loader, test_loader = load_mnist(args.data_dir, args.batch_size)
         num_channels = 1
-    elif args.dataset == 'celeba':
-        train_loader, test_loader = load_celeba(args.data_dir, args.batch_size)
-        num_channels = 3
+    elif args.dataset == 'liver':
+        pass
+    # elif args.dataset == 'celeba':
+    #     train_loader, test_loader = load_celeba(args.data_dir, args.batch_size)
+    #     num_channels = 3
+
+
+
 
     _use_cuda = torch.cuda.is_available() and args.cuda
     if _use_cuda:
