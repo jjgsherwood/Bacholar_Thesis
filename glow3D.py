@@ -9,7 +9,7 @@ import modules.functions as F2
 import modules.nets as nets
 
 
-class FlowStep(nn2.iSequential):
+class FlowStep(nn2.Sequential_Prob):
     """
     One step in the glow algorithm. Existing of normalization,
     mixing the channels and a Coupling layer.
@@ -17,7 +17,7 @@ class FlowStep(nn2.iSequential):
     def __init__(self, in_channels, hidden_channels):
         net = nets.net_NICE(in_channels // 2, hidden_channels)
         super().__init__(
-            norm.norm(in_channels),
+            norm.Norm(in_channels),
             mix.InvertibleConv3d_1x1(in_channels),
             couplings.NICE(net)
         )
@@ -25,7 +25,7 @@ class FlowStep(nn2.iSequential):
     def extra_repr(self):
         return "|Norm <-> Conv1x1 <-> Coupling|"
 
-class GLOW(nn2.iSequential):
+class GLOW(nn2.Sequential_Prob):
     def __init__(self, K, L, in_channels, hidden_channels):
         channels = in_channels
         sizes = ((2,2,1),) * L

@@ -8,19 +8,20 @@ import numpy as np
 import torch
 import torch.optim as optim
 
-# from utils.dataset_utils import load_celeba, load_mnist
-# from utils.train_utils import train_nll, test_nll, Warmup
+from utils.dataset_utils import load_liver, load_mnist
+from utils.train_utils import train_nll, test_nll, Warmup
 # from utils.image_utils import viz_array_grid, viz_array_set_grid, save_image
 
-# from glow import GLOW
-if __name__ == "__main__":
+from glow3D import GLOW
 
+
+if __name__ == "__main__":
     parser = ArgumentParser()
 
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--epochs', type=int, default=3)
     parser.add_argument('--cuda', type=eval, default=True, required=False, choices=[True, False])
-    parser.add_argument('--dataset', type=str, required=True, choices=['mnist', 'celeba'])
+    parser.add_argument('--dataset', type=str, required=True, choices=['mnist', 'liver'])
     parser.add_argument('--data_dir', type=str)
     parser.add_argument('--log_step', type=int, default=0)
     parser.add_argument('--output_dir', type=str, default='./experiment_output')
@@ -49,13 +50,8 @@ if __name__ == "__main__":
         train_loader, test_loader = load_mnist(args.data_dir, args.batch_size)
         num_channels = 1
     elif args.dataset == 'liver':
-        pass
-    # elif args.dataset == 'celeba':
-    #     train_loader, test_loader = load_celeba(args.data_dir, args.batch_size)
-    #     num_channels = 3
-
-
-
+        train_loader, test_loader = load_liver(args.data_dir, args.batch_size)
+        num_channels = 1
 
     _use_cuda = torch.cuda.is_available() and args.cuda
     if _use_cuda:
@@ -92,27 +88,28 @@ if __name__ == "__main__":
             torch.save(model.state_dict(), os.path.join(args.output_dir, 'model.pt'))
             print('Model is saved')
 
-            x = next(iter(test_loader))[0][:16]
-            x = x.to(device)
+            if args.dataset == 'mnist':
+                x = next(iter(test_loader))[0][:16]
+                x = x.to(device)
 
-            with torch.no_grad():
-                z, _ = model(x)
-                x_rec, _ = model.inverse(z)
-                z_samples = torch.randn(*z.shape).to(device)
-                x_gen, _ = model.inverse(z_samples)
+                with torch.no_grad():
+                    z, _ = model(x)
+                    x_rec, _ = model.inverse(z)
+                    z_samples = torch.randn(*z.size()).to(device)
+                    x_gen, _ = model.inverse(z_samples)
 
-            x = x.detach().cpu().numpy()
-            x_rec = x_rec.detach().cpu().numpy()
-            x_gen = x_gen.detach().cpu().numpy()
+                x = x.detach().cpu().numpy()._squeeze()
+                x_rec = x_rec.detach().cpu().numpy()._squeeze()
+                x_gen = x_gen.detach().cpu().numpy()._squeeze()
 
-            # samples
-            img = viz_array_grid(x_gen, 4, 4, padding=2)
-            save_image(img, os.path.join(args.output_dir, 'samples.png'), (8, 8))
+                # samples
+                img = viz_array_grid(x_gen, 4, 4, padding=2)
+                save_image(img, os.path.join(args.output_dir, 'samples.png'), (8, 8))
 
-            # reconstruction
-            img = viz_array_set_grid([[x, x_rec]], 4, 4, padding=2)
-            save_image(img, os.path.join(args.output_dir, 'reconstruction.png'), (16, 8))
-            print('Images are saved')
+                # reconstruction
+                img = viz_array_set_grid([[x, x_rec]], 4, 4, padding=2)
+                save_image(img, os.path.join(args.output_dir, 'reconstruction.png'), (16, 8))
+                print('Images are saved')
 
 
     print('Training is finished')

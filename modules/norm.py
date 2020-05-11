@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+from modules.functions import num_pixels
 
 class Norm(nn.Module):
     """

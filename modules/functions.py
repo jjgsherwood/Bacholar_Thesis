@@ -21,8 +21,8 @@ def get_in_out_channels(net):
 
 def num_pixels(x):
     num_elements = x.nelement()
-    B, C = x.size(0), x.size(1)
-    return num_elements / B / C
+    B, C, D = x.size(0), x.size(1), x.size(2)
+    return num_elements / B / C / D
 
 def unsqueeze3D(input, upscale_factor=(2,2,1)):
     '''

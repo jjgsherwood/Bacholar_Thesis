@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from modules.functions import num_pixels
 
 # class HH(nn.Module):
 #     def __init__(self, size, num_vectors=None):
