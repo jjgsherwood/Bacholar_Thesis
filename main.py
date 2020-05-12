@@ -4,18 +4,25 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 import numpy as np
+import configparser
+import pickle
 
 import torch
 import torch.optim as optim
 
 from utils.dataset_utils import load_liver, load_mnist
 from utils.train_utils import train_nll, test_nll, Warmup
-# from utils.image_utils import viz_array_grid, viz_array_set_grid, save_image
+from utils.image_utils import viz_array_grid, viz_array_set_grid, save_image
 
 from glow3D import GLOW
 
 
 if __name__ == "__main__":
+    # read config to find structure choices
+    config = configparser.ConfigParser()
+    config.read('glow_config.ini')
+    structure_choices = config.sections()
+
     parser = ArgumentParser()
 
     parser.add_argument('--batch_size', type=int, default=64)
@@ -34,9 +41,9 @@ if __name__ == "__main__":
     parser.add_argument('--k', type=int, default=1)
     parser.add_argument('--l', type=int, default=1)
     parser.add_argument('--hidden_ch', type=int, default=1)
+    parser.add_argument('--structure', type=str, default=structure_choices[0],  choices=structure_choices)
 
     args = parser.parse_args()
-
 
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
@@ -59,7 +66,10 @@ if __name__ == "__main__":
         torch.backends.cudnn.benchmark = True
     device = torch.device('cuda' if _use_cuda else 'cpu')
 
-    model = GLOW(args.k, args.l, num_channels, args.hidden_ch).to(device)
+    model = GLOW(args.k, args.l, num_channels, args.hidden_ch, args.structure).to(device)
+    with open(os.path.join(args.output_dir, 'model_parameters.pkl'), 'wb') as f:
+        pickle.dump(args, f)
+
     parameters = filter(lambda x: x.requires_grad, model.parameters())
     optimizer = optim.Adam(parameters, betas=(0.9, 0.9999))
     scheduler = Warmup(optimizer, args.init_lr, args.warmup_steps)
@@ -98,9 +108,9 @@ if __name__ == "__main__":
                     z_samples = torch.randn(*z.size()).to(device)
                     x_gen, _ = model.inverse(z_samples)
 
-                x = x.detach().cpu().numpy()._squeeze()
-                x_rec = x_rec.detach().cpu().numpy()._squeeze()
-                x_gen = x_gen.detach().cpu().numpy()._squeeze()
+                x = x.detach().cpu().squeeze(-1).numpy()
+                x_rec = x_rec.detach().cpu().squeeze(-1).numpy()
+                x_gen = x_gen.detach().cpu().squeeze(-1).numpy()
 
                 # samples
                 img = viz_array_grid(x_gen, 4, 4, padding=2)
@@ -110,6 +120,5 @@ if __name__ == "__main__":
                 img = viz_array_set_grid([[x, x_rec]], 4, 4, padding=2)
                 save_image(img, os.path.join(args.output_dir, 'reconstruction.png'), (16, 8))
                 print('Images are saved')
-
 
     print('Training is finished')
