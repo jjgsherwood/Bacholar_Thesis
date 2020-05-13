@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 import numpy as np
 import configparser
 import pickle
+import matplotlib.pyplot as plt
 
 import torch
 import torch.optim as optim
@@ -98,7 +99,31 @@ if __name__ == "__main__":
             torch.save(model.state_dict(), os.path.join(args.output_dir, 'model.pt'))
             print('Model is saved')
 
-            if args.dataset == 'mnist':
+            if args.dataset == 'liver':
+                x = next(iter(test_loader))[0]
+                x = x.to(device)
+
+                with torch.no_grad():
+                    z, _ = model(x)
+                    x_rec, _ = model.inverse(z)
+                    z_samples = torch.randn(*z.size()).to(device)
+                    x_gen, _ = model.inverse(z_samples)
+
+                x = x.detach().cpu().squeeze().numpy()
+                x_rec = x_rec.detach().cpu().squeeze().numpy()
+                x_gen = x_gen.detach().cpu().squeeze().numpy()
+
+                plt.plot(x[0], label='orginal')
+                plt.plot(x_rec[0], label='recreated')
+                plt.plot(x_gen[0], label='sampled')
+                plt.legend()
+                strFile = os.path.join(args.output_dir, f'sample.png')
+                if os.path.isfile(strFile):
+                    os.remove(strFile)
+                plt.savefig(strFile)
+                plt.clf()
+
+            elif args.dataset == 'mnist':
                 x = next(iter(test_loader))[0][:16]
                 x = x.to(device)
 

@@ -64,14 +64,16 @@ if __name__ == "__main__":
         x_rec = x_rec.detach().cpu().squeeze().numpy()
         x_gen = x_gen.detach().cpu().squeeze().numpy()
 
+        i = 0
         for x_o, x_r, x_g in zip(x, x_rec, x_gen):
             plt.plot(x_o, label='orginal')
             plt.plot(x_r, label='recreated')
             plt.plot(x_g, label='sampled')
             plt.legend()
             plt.show()
-            print(x_o.shape, x_r.shape, x_g.shape)
-            break
+            i += 1
+            if i > 5:
+                break
 
     elif args.dataset == 'mnist':
         x = next(iter(test_loader))[0][:16]
