@@ -28,7 +28,7 @@ class FlowStep(nn2.Sequential_Prob):
 class GLOW(nn2.Sequential_Prob):
     def __init__(self, K, L, in_channels, hidden_channels):
         channels = in_channels
-        sizes = ((2,2,1),) * L
+        sizes = ((1,1,4),) * L
         modules = []
 
         for i, size in enumerate(sizes):
