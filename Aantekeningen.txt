@@ -1,0 +1,17 @@
+------------------------------------------------------------------------------
+moduels.extend_nn.py
+class Split
+def inverse
+line 74
+z_dist = Normal(z_mu, 0) => z_dist = Normal(z_mu, 1) #for adding noise in the inverse or not.
+
+------------------------------------------------------------------------------
+utils.train_utils
+def train_nll
+line 45
+loss = get_bits_per_dim(x, model) # adjust this for liver data
+
+------------------------------------------------------------------------------
+utils.dataset_utils
+class UniformNoise
+def __call__(self, x) # Adjust for liver data.

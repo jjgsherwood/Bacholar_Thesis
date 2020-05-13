@@ -42,7 +42,7 @@ class Real_NVP(nn.Module):
         super().__init__()
         in_channels, hidden_channels = F2.get_in_out_channels(net)
         self.scale_shift = nn.Sequential(*net,
-            nn2.Conv2dZeros(hidden_channels, in_channels * 2))
+            nn2.Conv3dZeros(hidden_channels, in_channels * 2))
 
     def forward(self, x, log_p=0.0):
         C = x.size(1) // 2
@@ -54,7 +54,7 @@ class Real_NVP(nn.Module):
         scale = torch.sigmoid(scale + 2.0)
         x1 = (x1 + shift) * scale
 
-        log_det = torch.log(scale).mean(0).sum()
+        log_det = torch.log(scale).sum()
         return torch.cat([x1, x2], dim=1), log_p + log_det
 
     def inverse(self, x, log_p=0.0):
@@ -66,5 +66,32 @@ class Real_NVP(nn.Module):
         scale, shift = self.scale_shift(x2).split(C, dim=1)
         scale = torch.sigmoid(scale + 2.0)
         x1 = x1 / scale - shift
-        log_det = torch.log(scale).mean(0).sum()
+        log_det = torch.log(scale).sum()
         return torch.cat([x1, x2], dim=1), log_p - log_det
+
+class NICE_oneven(nn.Module):
+    """
+    net is a nn.Sequential with as in_channels and out_channels half the
+    channels of x.
+    """
+    def __init__(self, net):
+        super().__init__()
+        self.shift = net
+
+    def forward(self, x, log_p=0.0):
+        C = int(x.size(1) / 2 + 0.5)
+        x1, x2 = x.split(C, 1)
+        x1 = x1.contiguous()
+        x2 = x2.contiguous()
+
+        x2 = x2 + self.shift(x1)
+        return torch.cat([x2, x1], 1), log_p
+
+    def inverse(self, x, log_p=0.0):
+        C = x.size(1) // 2
+        x2, x1 = x.split(C, 1)
+        x1 = x1.contiguous()
+        x2 = x2.contiguous()
+
+        x2 = x2 - self.shift(x1)
+        return torch.cat([x1, x2], 1), log_p

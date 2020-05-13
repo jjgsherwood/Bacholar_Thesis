@@ -43,7 +43,7 @@ def unsqueeze3D(input, upscale_factor=(2,2,1)):
     )
 
     output = input_view.permute(0, 1, 5, 2, 6, 3, 7, 4).contiguous()
-    return output.view(batch_size, out_channels, out_height, out_width)
+    return output.view(batch_size, out_channels, out_height, out_width, out_lambda)
 
 
 def squeeze3D(input, downscale_factor=(2,2,1)):
@@ -66,7 +66,7 @@ def squeeze3D(input, downscale_factor=(2,2,1)):
     input_view = input.contiguous().view(batch_size, in_channels,
                                          out_height, downscale_factor[0],
                                          out_width, downscale_factor[1],
-                                         in_lambda, downscale_factor[2]
+                                         out_lambda, downscale_factor[2]
     )
 
     output = input_view.permute(0, 1, 3, 5, 7, 2, 4, 6).contiguous()

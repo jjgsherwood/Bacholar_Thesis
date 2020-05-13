@@ -83,7 +83,7 @@ def load_liver(data_file, batch_size):
     assert os.path.isfile(data_file)
 
     transform = transforms.Compose([
-        UniformNoise()
+        
     ])
 
     data = np.load(data_file, 'r')
