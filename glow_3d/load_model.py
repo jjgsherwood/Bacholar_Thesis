@@ -7,6 +7,7 @@ import numpy as np
 import configparser
 import pickle
 import matplotlib.pyplot as plt
+import random
 
 import torch
 import torch.optim as optim
@@ -50,50 +51,59 @@ if __name__ == "__main__":
     model.load_state_dict(torch.load(os.path.join(args.output_dir, 'model.pt')))
     model.eval()
 
-    if args.dataset == 'liver':
-        x = next(iter(test_loader))[0]
-        x = x.to(device)
+    while True:
 
-        with torch.no_grad():
-            z, _ = model(x)
-            x_rec, _ = model.inverse(z)
-            z_samples = torch.randn(*z.size()).to(device)
-            x_gen, _ = model.inverse(z_samples)
 
-        x = x.detach().cpu().squeeze().numpy()
-        x_rec = x_rec.detach().cpu().squeeze().numpy()
-        x_gen = x_gen.detach().cpu().squeeze().numpy()
+        if args.dataset == 'liver':
+            x = next(iter(test_loader))[0]
+            x = x.to(device)
 
-        i = 0
-        for x_o, x_r, x_g in zip(x, x_rec, x_gen):
-            plt.plot(x_o, label='orginal')
-            plt.plot(x_r, label='recreated')
-            plt.plot(x_g, label='sampled')
-            plt.legend()
-            plt.show()
-            i += 1
-            if i > 5:
-                break
+            with torch.no_grad():
+                z, _ = model(x)
+                s = z.detach().cpu().squeeze().numpy().std(0)
+                m = z.detach().cpu().squeeze().numpy().mean(0)
+                x_rec, _ = model.inverse(z)
+                z_samples = torch.zeros(*z.size()).to(device)
+                # u = random.randint(0,z.size(4))
+                # z_samples[0,:,:,:,u] = 1
+                for i, (mu, sigma) in enumerate(zip(m,s)):
+                    z_samples[0,:,:,:,i] = np.random.normal(mu, sigma, 1)[0]
+                x_gen, _ = model.inverse(z_samples)
 
-    elif args.dataset == 'mnist':
-        x = next(iter(test_loader))[0][:16]
-        x = x.to(device)
+            x = x.detach().cpu().squeeze().numpy()
+            x_rec = x_rec.detach().cpu().squeeze().numpy()
+            x_gen = x_gen.detach().cpu().squeeze().numpy()
 
-        with torch.no_grad():
-            z, _ = model(x)
-            x_rec, _ = model.inverse(z)
-            z_samples = torch.randn(*z.size()).to(device)
-            x_gen, _ = model.inverse(z_samples)
+            i = 0
+            for x_o, x_r, x_g in zip(x, x_rec, x_gen):
+                plt.plot(x_o, label='orginal')
+                plt.plot(x_r, label='recreated')
+                plt.plot(x_g, label='sampled')
+                plt.legend()
+                plt.show()
+                i += 1
+                if i > 0:
+                    break
 
-        x = x.detach().cpu().squeeze(-1).numpy()
-        x_rec = x_rec.detach().cpu().squeeze(-1).numpy()
-        x_gen = x_gen.detach().cpu().squeeze(-1).numpy()
+        elif args.dataset == 'mnist':
+            x = next(iter(test_loader))[0][:16]
+            x = x.to(device)
 
-        # samples
-        img = viz_array_grid(x_gen, 4, 4, padding=2)
-        save_image(img, os.path.join(args.output_dir, 'samples.png'), (8, 8))
+            with torch.no_grad():
+                z, _ = model(x)
+                x_rec, _ = model.inverse(z)
+                z_samples = torch.randn(*z.size()).to(device)
+                x_gen, _ = model.inverse(z_samples)
 
-        # reconstruction
-        img = viz_array_set_grid([[x, x_rec]], 4, 4, padding=2)
-        save_image(img, os.path.join(args.output_dir, 'reconstruction.png'), (16, 8))
-        print('Images are saved')
+            x = x.detach().cpu().squeeze(-1).numpy()
+            x_rec = x_rec.detach().cpu().squeeze(-1).numpy()
+            x_gen = x_gen.detach().cpu().squeeze(-1).numpy()
+
+            # samples
+            img = viz_array_grid(x_gen, 4, 4, padding=2)
+            save_image(img, os.path.join(args.output_dir, 'samples.png'), (8, 8))
+
+            # reconstruction
+            img = viz_array_set_grid([[x, x_rec]], 4, 4, padding=2)
+            save_image(img, os.path.join(args.output_dir, 'reconstruction.png'), (16, 8))
+            print('Images are saved')

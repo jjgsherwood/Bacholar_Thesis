@@ -71,7 +71,7 @@ class Split(nn.Module):
         size = list(x.size())
         size[1] = self.in_features - self.out_features
         z_mu = torch.zeros(*size, device=x.device)
-        z_dist = Normal(z_mu, 0)
+        z_dist = Normal(z_mu, 0.1)
         z = z_dist.sample()
         x = torch.cat([x, z], 1)
         log_p_z = z_dist.log_prob(z).sum()

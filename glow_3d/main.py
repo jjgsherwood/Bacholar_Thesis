@@ -7,6 +7,7 @@ import numpy as np
 import configparser
 import pickle
 import matplotlib.pyplot as plt
+import random
 
 import torch
 import torch.optim as optim

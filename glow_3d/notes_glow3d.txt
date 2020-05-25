@@ -15,3 +15,9 @@ loss = get_bits_per_dim(x, model) # adjust this for liver data
 utils.dataset_utils
 class UniformNoise
 def __call__(self, x) # Adjust for liver data.
+
+------------------------------------------------------------------------------
+utils.train_utils
+def get_bits_per_dim
+line 35
+# ll = 8.0 - ll / (np.log(2.0) * x.nelement()) #commented

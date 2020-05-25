@@ -13,11 +13,14 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 class UniformNoise():
+    def __init__(self, max_bit=8):
+        self.max = 2**max_bit
+
     def __call__(self, x):
         with torch.no_grad():
             noise = x.new().resize_as_(x).uniform_()
-            x = x * 255 + noise
-            x = x / 256
+            x = x * (self.max - 1) + noise
+            x = x / self.max
         return x
 
     def __repr__(self):
@@ -29,6 +32,13 @@ class From_2D_to_3D():
 
     def __repr__(self):
         return "Unsqueeze"
+
+class Vector_unit_normalization():
+    def __call__(self, x):
+        return x / np.sqrt((x**2).sum(axis=3))
+
+    def __repr__(self):
+        return "Vector unit normalization"
 
 class TensorDataset(Dataset):
     """TensorDataset with support of transforms.
@@ -83,7 +93,8 @@ def load_liver(data_file, batch_size):
     assert os.path.isfile(data_file)
 
     transform = transforms.Compose([
-        
+        Vector_unit_normalization(),
+        UniformNoise(16)
     ])
 
     data = np.load(data_file, 'r')

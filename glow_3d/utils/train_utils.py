@@ -31,8 +31,10 @@ class Warmup(object):
 def get_bits_per_dim(x, model):
     z, log_p = model(x)
     dist = Normal(torch.zeros_like(z, device=z.device), 1.0)
-    ll = log_p.sum() + dist.log_prob(z).sum().to(z.device)
+    # print(log_p.sum().cpu().detach().numpy(), dist.log_prob(z).sum().to(z.device).cpu().detach().numpy(), ((x - model.inverse(z)[0])**2).sum().cpu().detach().numpy())
+    ll = log_p.sum() + dist.log_prob(z).sum().to(z.device) - ((x - model.inverse(z)[0])**2).sum() * 10000
     ll = 8.0 - ll / (np.log(2.0) * x.nelement())
+    # ll = ((x - model.inverse(z)[0])**2).sum()
     return ll
 
 def train_nll(model, optimizer, loader, scheduler=None, log_step=None, device=torch.device('cuda')):
