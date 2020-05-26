@@ -68,7 +68,7 @@ def create_dataset_1x1(data):
 def load_liver(data, batch_size):
     transform = transforms.Compose([
         Vector_unit_normalization(),
-        UniformNoise(16)
+        UniformNoise(12)
     ])
 
     data = create_dataset_1x1(data)
