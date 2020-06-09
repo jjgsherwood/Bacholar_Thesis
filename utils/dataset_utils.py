@@ -77,9 +77,9 @@ def load_liver(data, batch_size):
 
     train_dataset, test_dataset = split_data(dataset)
     train_loader = DataLoader(train_dataset, batch_size, shuffle=True,
-                              drop_last=True, pin_memory=True, num_workers=NUM_WORKERS)
+                              drop_last=False, pin_memory=True, num_workers=NUM_WORKERS)
     test_loader = DataLoader(test_dataset, batch_size, shuffle=False,
-                             drop_last=True, pin_memory=True, num_workers=NUM_WORKERS)
+                             drop_last=False, pin_memory=True, num_workers=NUM_WORKERS)
 
     return train_loader, test_loader
 
