@@ -40,9 +40,7 @@ def train(config):
     # loss_function = nn.MSELoss()
     print("start training")
 
-    for i in range(config.epochs):
-        # Only for time measurement of step through network
-        t1 = time.time()
+    for epoch in range(config.epochs):
         for batch_inputs, batch_targets in tqdm(data_loader, desc=f"Training epoch {epoch}", leave=False, position=0):
             # Move to GPU
             batch_inputs = batch_inputs.to(device)
@@ -63,14 +61,6 @@ def train(config):
             optimizer.step()
             print(loss)
 
-        # Just for time measurement
-        t2 = time.time()
-
-        eps = len(dataset)/float(t2-t1)
-        t = datetime.now().strftime("%Y-%m-%d %H:%M")
-        print(f"{t} Epoch {i}/{config.epochs}, Examples/Sec = {eps:.2f}, \
-                loss = {loss*10000:.2f}")
-
         out = out.cpu().detach().numpy()
         batch_inputs = batch_inputs.cpu().detach().numpy()
         batch_targets = batch_targets.cpu().detach().numpy()
@@ -79,7 +69,7 @@ def train(config):
         plt.plot(range(batch_inputs.shape[1]), batch_inputs[0], label="raw")
         plt.plot(range(batch_targets.shape[1]), batch_targets[0], label='manualy')
         plt.legend()
-        plt.savefig(f"epoch {i}")
+        plt.savefig(f"epoch {epoch}")
         plt.close()
 
     print('Done training.')
