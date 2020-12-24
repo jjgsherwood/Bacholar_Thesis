@@ -52,7 +52,7 @@ def train(config):
             mean, log_std, out = model(batch_inputs)
 
             # Compute the loss, gradients and update network parameters
-            loss = loss_function(out.float(), batch_inputs.float()) + KLD(mean, log_std)
+            loss = loss_function(out.float(), batch_inputs.float()) + KLD(mean, log_std).mean()
             loss.backward()
 
             torch.nn.utils.clip_grad_norm_(model.parameters(),
