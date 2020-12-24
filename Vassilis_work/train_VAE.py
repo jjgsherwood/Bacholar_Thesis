@@ -57,7 +57,7 @@ def train(config):
     # Setup the loss and optimizer
     optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
     # loss_function = LogCoshLoss()
-    loss_function = nn.MSELoss('none')
+    loss_function = nn.MSELoss(reduction='none')
 
     print("start training")
     loss_graph = []
