@@ -64,22 +64,23 @@ def train(config):
 
             loss_graph_tmp += loss
 
-        plt.figure()
-        loss_graph.append(loss_graph_tmp / epoch)
-        plt.plot(range(len(loss_graph)), loss_graph)
-        plt.savefig(f"loss")
-        plt.close()
+        if not epoch % 5:
+            plt.figure()
+            loss_graph.append(loss_graph_tmp / epoch)
+            plt.plot(range(len(loss_graph)), loss_graph)
+            plt.savefig(f"images/loss", dpi=500)
+            plt.close()
 
-        out = out.cpu().detach().numpy()
-        batch_inputs = batch_inputs.cpu().detach().numpy()
-        batch_targets = batch_targets.cpu().detach().numpy()
-        plt.figure()
-        plt.plot(range(out.shape[1]), out[0], label="LSTM")
-        plt.plot(range(batch_inputs.shape[1]), batch_inputs[0], label="raw")
-        plt.plot(range(batch_targets.shape[1]), batch_targets[0], label='manualy')
-        plt.legend()
-        plt.savefig(f"epoch {epoch}")
-        plt.close()
+            out = out.cpu().detach().numpy()
+            batch_inputs = batch_inputs.cpu().detach().numpy()
+            batch_targets = batch_targets.cpu().detach().numpy()
+            plt.figure()
+            plt.plot(range(out.shape[1]), out[0], label="LSTM")
+            plt.plot(range(batch_inputs.shape[1]), batch_inputs[0], label="raw")
+            plt.plot(range(batch_targets.shape[1]), batch_targets[0], label='manualy')
+            plt.legend()
+            plt.savefig(f"images/epoch {epoch}", dpi=500)
+            plt.close()
 
     print('Done training.')
 
