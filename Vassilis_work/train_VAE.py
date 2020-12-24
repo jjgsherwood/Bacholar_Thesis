@@ -44,7 +44,7 @@ def train(config):
     parameters = {
         'device': device,
         'input_dim': dataset.sequence_len,
-        'hidden_dims': [512, 256],
+        'hidden_dims': [1024, 512, 256, 128],
         'z_dim': 32,
     }
 
