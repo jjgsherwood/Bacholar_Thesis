@@ -27,9 +27,13 @@ def sample_and_save(model, epoch, batch_size=64):
         summary_writer - A TensorBoard summary writer to log the image samples.
         batch_size - Number of images to generate/sample
     """
+    plt.figure()
+
     sample = model.sample(batch_size)
-    grid = make_grid(sample.cpu(), nrow=8)
-    save_image(grid, os.path.join('images', f'sample_{epoch}.png'))
+    for s in sample:
+        plt.plot(range(len(s)), s)
+    plt.savefig(f"images/sample {epoch}", dpi=2000)
+    plt.close()
 
 def train(config):
     # Initialize the device which to run the model on
@@ -99,7 +103,7 @@ def train(config):
             plt.plot(range(len(loss_graph)), loss_graph_rec, label='reconstruction')
             plt.plot(range(len(loss_graph)), loss_graph_reg, label='regularization')
             plt.legend()
-            plt.savefig(f"images/loss", dpi=500)
+            plt.savefig(f"images/loss", dpi=2000)
             plt.close()
 
             out = out.cpu().detach().numpy()
@@ -110,10 +114,10 @@ def train(config):
             plt.plot(range(batch_inputs.shape[1]), batch_inputs[0], label="raw")
             plt.plot(range(batch_targets.shape[1]), batch_targets[0], label='manualy')
             plt.legend()
-            plt.savefig(f"images/epoch {epoch}", dpi=500)
+            plt.savefig(f"images/epoch {epoch}", dpi=2000)
             plt.close()
 
-            sample_and_save(model, epoch, 64)
+            sample_and_save(model, epoch, 4)
 
     print('Done training.')
 
