@@ -27,7 +27,8 @@ def train(config):
     # Initialize the model that we are going to use
     parameters = {
         'device': device,
-        'input_dim': dataset.shape
+        'input_dim': dataset.shape,
+        'hidden_dims': [512, 256],
     }
 
     model = VAEModel().to(device)

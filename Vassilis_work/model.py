@@ -3,7 +3,7 @@ import torch
 import numpy as np
 from Layers import *
 
-class VAEModel(nn.Modele):
+class VAEModel(nn.Module):
     def __init__(self, model_name, **kwargs):
         """
         PyTorch module that summarizes all components to train a VAE.
@@ -16,9 +16,6 @@ class VAEModel(nn.Modele):
         super().__init__()
         for k,v in kwargs:
             setattr(self, k, v)
-
-        self.input_dim = input_dim
-        self.z_dim = z_dim
 
         if model_name == 'MLP':
             self.encoder = MLPEncoder(self.input_dim, self.hidden_dims, self.z_dim)
