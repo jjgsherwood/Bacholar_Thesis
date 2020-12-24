@@ -95,14 +95,3 @@ class RamanDataset(data.Dataset):
 
     def __len__(self):
         return len(self._data)
-
-
-# np.load(f'../data/Raman/split_data/Alina_art_1_1_sm', X_smooth)
-# np.load(f'../data/Raman/split_data/Alina_art_1_1_R', ram_X)
-# np.load(f'../data/Raman/split_data/Alina_art_1_1_FL', afl_X)
-# np.load(f'../data/Raman/split_data/Alina_art_2_1_sm', Y_smooth)
-# np.load(f'../data/Raman/split_data/Alina_art_2_1_R', ram_Y)
-# np.load(f'../data/Raman/split_data/Alina_art_2_1_FL', afl_Y)
-# np.load(f'../data/Raman/split_data/Alina_art_4_2_sm', Z_smooth)
-# np.load(f'../data/Raman/split_data/Alina_art_4_2_R', ram_Z)
-# np.load(f'../data/Raman/split_data/Alina_art_4_2_FL', afl_Z)

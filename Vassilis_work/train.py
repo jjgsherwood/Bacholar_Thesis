@@ -50,6 +50,7 @@ def train(config):
 
             # Compute the loss, gradients and update network parameters
             loss = loss_function(out.float(), batch_targets.float())
+            print(batch_targets.shape)
             loss.backward()
 
             torch.nn.utils.clip_grad_norm_(model.parameters(),

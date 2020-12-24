@@ -3,6 +3,9 @@ import torch
 import numpy as np
 
 class RNNModel(nn.Module):
+    """
+    Smoothing RNN
+    """
     def __init__(self, lstm_num_hidden=256, lstm_num_layers=2):
         super(RNNModel, self).__init__()
         self.lstm = nn.LSTM(1,
@@ -17,6 +20,9 @@ class RNNModel(nn.Module):
         return self.linear(h), state
 
 class RNN2Model(nn.Module):
+    """
+    Splitting RNN for Raman and AF
+    """
     def __init__(self, lstm_num_hidden=256, lstm_num_layers=2):
         super(RNN2Model, self).__init__()
         self.lstm1 = nn.LSTM(1,
@@ -40,6 +46,9 @@ class RNN2Model(nn.Module):
         return torch.cat((self.linear1(h1), self.linear2(h2)), 1), (state1, state2)
 
 class RNN3Model(nn.Module):
+    """
+    Splitting RNN for Raman and AF plus smoothing
+    """
     def __init__(self, lstm_num_hidden=256, lstm_num_layers=2):
         super(RNN3Model, self).__init__()
         self.lstm1 = nn.LSTM(1,
