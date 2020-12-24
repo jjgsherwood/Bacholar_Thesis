@@ -14,9 +14,7 @@ class VAEModel(nn.Module):
             z_dim - Dimensionality of latent space
         """
         super().__init__()
-        print(kwargs)
-        for k,v in kwargs.items():
-            setattr(self, k, v)
+        self.__dict__.update(kwargs)
 
         if model_name == 'MLP':
             self.encoder = MLPEncoder(self.input_dim, self.hidden_dims, self.z_dim)
