@@ -4,7 +4,7 @@ import numpy as np
 
 
 class MLPEncoder(nn.Module):
-    def __init__(self, input_dim=[784], n_hidden=[512], z_dim=20):
+    def __init__(self, input_dim=2126, n_hidden=[512], z_dim=20):
         """
         Encoder with an MLP network and ReLU activations (except the output layer).
 
@@ -22,7 +22,7 @@ class MLPEncoder(nn.Module):
 
         # COPIED FROM ASSIGNMENT 1
         self.full = []
-        self.n_inputs = prev = np.prod(input_dim)
+        self.n_inputs = input_dim
 
         for next in n_hidden:
             self.full.append(nn.Linear(prev, next))
@@ -41,12 +41,10 @@ class MLPEncoder(nn.Module):
             log_std - Tensor of shape [B,z_dim] representing the predicted log standard deviation
                       of the latent distributions.
         """
-
-        # Remark: Make sure to understand why we are predicting the log_std and not std
-        return self.full(x.reshape(-1, self.n_inputs)).chunk(2, 1)
+        return self.full(x).chunk(2, 1)
 
 class MLPDecoder(nn.Module):
-    def __init__(self, z_dim=20, n_hidden=[512], output_shape=[1,28,28]):
+    def __init__(self, z_dim=20, n_hidden=[512], output_shape=2126):
         """
         Decoder with an MLP network.
         Inputs:
@@ -57,7 +55,6 @@ class MLPDecoder(nn.Module):
                            the product of the shape elements.
         """
         super().__init__()
-        self.output_shape = output_shape
         self.full = []
         prev = z_dim
 
@@ -66,7 +63,7 @@ class MLPDecoder(nn.Module):
             prev = next
             self.full.append(nn.ReLU(True))
 
-        self.full.append(nn.Linear(prev, np.prod(output_shape)))
+        self.full.append(nn.Linear(prev, output_shape))
         self.full = nn.Sequential(*self.full)
         # For an intial architecture, you can use a sequence of linear layers and ReLU activations.
         # Feel free to experiment with the architecture yourself, but the one specified here is
@@ -81,12 +78,4 @@ class MLPDecoder(nn.Module):
                 This should be a logit output *without* a sigmoid applied on it.
                 Shape: [B,output_shape[0],output_shape[1],output_shape[2]]
         """
-        return self.full(z).reshape(-1, *self.output_shape)
-
-    @property
-    def device(self):
-        """
-        Property function to get the device on which the decoder is.
-        Might be helpful in other functions.
-        """
-        return next(self.parameters()).device
+        return self.full(z)

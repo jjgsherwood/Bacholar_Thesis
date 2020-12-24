@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch
 import numpy as np
 from Layers import *
+from utils import sample_reparameterize
 
 class VAEModel(nn.Module):
     def __init__(self, model_name, **kwargs):
@@ -46,9 +47,7 @@ class VAEModel(nn.Module):
                      between 0 and 1 from which we obtain "x_samples"
         """
         z = torch.randn((batch_size, self.z_dim)).to(self.device)
-        x_mean = torch.sigmoid(self.decoder(z))
-        x_samples = torch.bernoulli(x_mean)
-        return x_samples, x_mean
+        return self.decoder(z)
 
     @property
     def shape(self):
@@ -129,11 +128,3 @@ class RNN3Model(nn.Module):
         h2, state2 = self.lstm2(x, state2)
         o1, o2 = self.linear1(h1), self.linear2(h2)
         return torch.cat((o1, o2, o1 + o2), 1), (state1, state2)
-
-class LogCoshLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, y_t, y_prime_t):
-        ey_t = y_t - y_prime_t
-        return torch.mean(torch.log(torch.cosh(ey_t + 1e-12)))

@@ -12,7 +12,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from utils import RamanDataset
+from utils import *
 from model import *
 
 def train(config):
@@ -28,7 +28,8 @@ def train(config):
     parameters = {
         'device': device,
         'input_dim': dataset.sequence_len,
-        'hidden_dims': [512, 256]
+        'hidden_dims': [512, 256],
+        'z_dim': 32,
     }
 
     model = VAEModel('MLP', **parameters).to(device)
@@ -51,7 +52,8 @@ def train(config):
 
             # Forward pass
             batch_inputs = batch_inputs.unsqueeze(2)
-            out, _ = model(batch_inputs)
+            print(batch_inputs.shape)
+            m, s, out = model(batch_inputs)
             out = out.squeeze()
 
             # Compute the loss, gradients and update network parameters
