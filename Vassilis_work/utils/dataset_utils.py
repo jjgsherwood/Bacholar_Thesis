@@ -84,6 +84,7 @@ class RamanDataset(data.Dataset):
         _, self._target = zip(*self._target)
         self._data, *self._target = unit_vector_norm(self._data, *self._target)
 
+    @property
     def shape(self):
         return self._shape
 

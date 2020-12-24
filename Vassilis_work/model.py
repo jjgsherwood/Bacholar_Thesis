@@ -56,6 +56,13 @@ class VAEModel(nn.Module):
     def shape(self):
         return self.input_dim
 
+    @property
+    def device(self):
+        """
+        Property function to get the device on which the model is.
+        """
+        return self.device
+
 class RNNModel(nn.Module):
     """
     Smoothing RNN
