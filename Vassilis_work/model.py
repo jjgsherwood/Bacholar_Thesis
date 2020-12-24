@@ -14,6 +14,7 @@ class VAEModel(nn.Module):
             z_dim - Dimensionality of latent space
         """
         super().__init__()
+        print(kwargs)
         for k,v in kwargs:
             setattr(self, k, v)
 
