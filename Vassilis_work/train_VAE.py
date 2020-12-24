@@ -31,7 +31,7 @@ def train(config):
         'hidden_dims': [512, 256]
     }
 
-    model = VAEModel('MLP', parameters).to(device)
+    model = VAEModel('MLP', **parameters).to(device)
 
     # Setup the loss and optimizer
     optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
