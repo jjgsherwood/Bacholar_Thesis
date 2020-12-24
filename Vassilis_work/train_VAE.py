@@ -29,7 +29,7 @@ def sample_and_save(model, epoch, batch_size=64):
     """
     plt.figure()
 
-    sample = model.sample(batch_size)
+    sample = model.sample(batch_size).to('cpu')
     for s in sample:
         plt.plot(range(len(s)), s)
     plt.savefig(f"images/sample {epoch}", dpi=2000)
