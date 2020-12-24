@@ -27,7 +27,7 @@ def sample_and_save(model, epoch, batch_size=64):
         summary_writer - A TensorBoard summary writer to log the image samples.
         batch_size - Number of images to generate/sample
     """
-    sample, _ = model.sample(batch_size)
+    sample = model.sample(batch_size)
     grid = make_grid(sample.cpu(), nrow=8)
     save_image(grid, os.path.join('images', f'sample_{epoch}.png'))
 
