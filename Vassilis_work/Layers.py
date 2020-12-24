@@ -22,7 +22,7 @@ class MLPEncoder(nn.Module):
 
         # COPIED FROM ASSIGNMENT 1
         self.full = []
-        self.n_inputs = input_dim
+        prev = input_dim
 
         for next in n_hidden:
             self.full.append(nn.Linear(prev, next))
