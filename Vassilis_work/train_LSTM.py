@@ -13,7 +13,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from utils import RamanDataset
-from model import RNNModel, RNN2Model, LogCoshLoss
+from model import *
 
 def train(config):
     # Initialize the device which to run the model on
@@ -25,7 +25,7 @@ def train(config):
     data_loader = DataLoader(dataset, config.batch_size, shuffle=True)
 
     # Initialize the model that we are going to use
-    model = RNN2Model().to(device)
+    model = RNN3Model().to(device)
 
     # Setup the loss and optimizer
     optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
@@ -39,20 +39,17 @@ def train(config):
         for batch_inputs, batch_targets in tqdm(data_loader):
             # Move to GPU
             batch_inputs = batch_inputs.to(device)
-            batch_targets1 = batch_targets1.to(device)
-            batch_targets2 = batch_targets2.to(device)
-
+            batch_targets = batch_targets.to(device)
             # Reset for next iteration
             model.zero_grad()
 
             # Forward pass
             batch_inputs = batch_inputs.unsqueeze(2)
             out, _ = model(batch_inputs)
-            print(out.shape)
             out = out.squeeze()
 
             # Compute the loss, gradients and update network parameters
-            loss = loss_function(out1.float(), batch_targets1.float())
+            loss = loss_function(out.float(), batch_targets.float())
             loss.backward()
 
             torch.nn.utils.clip_grad_norm_(model.parameters(),
@@ -69,19 +66,16 @@ def train(config):
         print(f"{t} Epoch {i}/{config.epochs}, Examples/Sec = {eps:.2f}, \
                 loss = {loss*10000:.2f}")
 
-        out1 = out1.cpu().detach().numpy()
-        out2 = out2.cpu().detach().numpy()
+        out = out.cpu().detach().numpy()
         batch_inputs = batch_inputs.cpu().detach().numpy()
-        batch_targets1 = batch_targets1.cpu().detach().numpy()
-        batch_targets2 = batch_targets2.cpu().detach().numpy()
-
-        plt.plot(range(out.shape[1]), out1[0], label="LSTM1")
-        plt.plot(range(out.shape[1]), out2[0], label="LSTM2")
-        plt.plot(range(out.shape[1]), batch_inputs[0], label="raw")
-        plt.plot(range(out.shape[1]), batch_targets1[0], label='manualy1')
-        plt.plot(range(out.shape[1]), batch_targets2[0], label='manualy2')
+        batch_targets = batch_targets.cpu().detach().numpy()
+        plt.figure()
+        plt.plot(range(out.shape[1]), out[0], label="LSTM")
+        plt.plot(range(batch_inputs.shape[1]), batch_inputs[0], label="raw")
+        plt.plot(range(batch_targets.shape[1]), batch_targets[0], label='manualy')
         plt.legend()
-        plt.show()
+        plt.savefig(f"epoch {i}")
+        plt.close()
 
     print('Done training.')
 
@@ -93,22 +87,22 @@ if __name__ == "__main__":
     # Model params
     parser.add_argument('--folder', type=str, default=None,
                         help="Path to the folder off the dataset")
-    parser.add_argument('--mode', type=str, default="split",
+    parser.add_argument('--mode', type=str, default="all",
                         help="Structure of the NN output.")
     parser.add_argument('--seq_length', type=int, default=30,
                         help='Length of an input sequence')
-    parser.add_argument('--lstm_num_hidden', type=int, default=128,
+    parser.add_argument('--lstm_num_hidden', type=int, default=256,
                         help='Number of hidden units in the LSTM')
-    parser.add_argument('--lstm_num_layers', type=int, default=2,
+    parser.add_argument('--lstm_num_layers', type=int, default=3,
                         help='Number of LSTM layers in the model')
 
     # Training params
     parser.add_argument('--batch_size', type=int, default=16,
                         help='Number of examples to process in a batch')
-    parser.add_argument('--learning_rate', type=float, default=1e-4,
+    parser.add_argument('--learning_rate', type=float, default=1e-5,
                         help='Learning rate')
 
-    parser.add_argument('--epochs', type=int, default=int(10),
+    parser.add_argument('--epochs', type=int, default=int(100),
                         help='Number of training epochs')
     parser.add_argument('--max_norm', type=float, default=5.0, help='--')
 

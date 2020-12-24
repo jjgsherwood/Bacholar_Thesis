@@ -49,9 +49,6 @@ def load_data(filenames):
         return np.concatenate([d.reshape(-1, d.shape[2]) for d in data], axis=0), [d.shape for d in data]
     return np.concatenate(data, axis=0)
 
-# def unit_vector_norm(X, *args):
-#     return (X.T / ((X**2).sum(axis=1))**0.5).T
-
 def unit_vector_norm(X, *args):
     s = ((X**2).sum(axis=1))**0.5
     return (X.T / s).T, *[(x.T/s).T for x in args]
@@ -63,8 +60,10 @@ class RamanDataset(data.Dataset):
             needed_keys = ('raw', 'smooth')
         elif mode == 'split':
             needed_keys = ('raw', 'raman', 'fluorescence')
-        else:
+        elif mode == 'all':
             needed_keys = ('raw', 'raman', 'fluorescence', 'smooth')
+        else:
+            raise ValueError("This mode is not known to the Dataset")
 
         if file_dir is None:
             needed_dict = {k:v for k,v in FILE_DICT.items() if k in needed_keys}
@@ -85,9 +84,8 @@ class RamanDataset(data.Dataset):
         _, self._target = zip(*self._target)
         self._data, *self._target = unit_vector_norm(self._data, *self._target)
 
-    # def __getitem__(self, index):
-    #     # check the index is not on the split
-    #     return self._data[index], self._data[index]
+    def shape(self):
+        return self._shape
 
     def __getitem__(self, index):
         # check the index is not on the split

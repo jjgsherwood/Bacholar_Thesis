@@ -23,9 +23,14 @@ def train(config):
     # Initialize the dataset and data loader (note the +1)
     dataset = RamanDataset(config.seq_length, config.mode, config.folder)
     data_loader = DataLoader(dataset, config.batch_size, shuffle=True)
-
+    print(dataset.shape)
     # Initialize the model that we are going to use
-    model = RNN3Model().to(device)
+    parameters = {
+        'device': device,
+        'input_dim': dataset.shape
+    }
+
+    model = VAEModel().to(device)
 
     # Setup the loss and optimizer
     optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
@@ -50,7 +55,6 @@ def train(config):
 
             # Compute the loss, gradients and update network parameters
             loss = loss_function(out.float(), batch_targets.float())
-            print(batch_targets.shape)
             loss.backward()
 
             torch.nn.utils.clip_grad_norm_(model.parameters(),
@@ -88,8 +92,8 @@ if __name__ == "__main__":
     # Model params
     parser.add_argument('--folder', type=str, default=None,
                         help="Path to the folder off the dataset")
-    parser.add_argument('--mode', type=str, default="all",
-                        help="Structure of the NN output.")
+    parser.add_argument('--mode', type=str, default="smooth",
+                        help="Structure of the NN output [all, smooth, split].")
     parser.add_argument('--seq_length', type=int, default=30,
                         help='Length of an input sequence')
     parser.add_argument('--lstm_num_hidden', type=int, default=256,

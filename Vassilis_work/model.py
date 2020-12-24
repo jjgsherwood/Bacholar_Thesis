@@ -1,6 +1,62 @@
 import torch.nn as nn
 import torch
 import numpy as np
+from Layers import *
+
+class VAEModel(nn.Modele):
+    def __init__(self, model_name, **kwargs):
+        """
+        PyTorch module that summarizes all components to train a VAE.
+        Inputs:
+            model_name - String denoting what encoder/decoder class to use.  Either 'MLP' or 'CNN'
+            hidden_dims - List of hidden dimensionalities to use in the MLP layers of the encoder (decoder reversed)
+            num_filters - Number of channels to use in a CNN encoder/decoder
+            z_dim - Dimensionality of latent space
+        """
+        super().__init__()
+        for k,v in kwargs:
+            setattr(self, k, v)
+
+        self.input_dim = input_dim
+        self.z_dim = z_dim
+
+        if model_name == 'MLP':
+            self.encoder = MLPEncoder(self.input_dim, self.hidden_dims, self.z_dim)
+            self.decoder = MLPDecoder(self.z_dim, self.hidden_dims[::-1], self.input_dim)
+
+    def forward(self, signal):
+        """
+        The forward function calculates the VAE loss for a given batch of images.
+        Inputs:
+            imgs - Batch of tensors of shape [B,S]
+        Ouptuts:
+            means
+            sigmas
+            outputS
+        """
+        m, s = self.encoder(signal)
+        latent = sample_reparameterize(m, s)
+        return m, s, self.decoder(latent)
+
+    @torch.no_grad()
+    def sample(self, batch_size):
+        """
+        Function for sampling a new batch of random images.
+        Inputs:
+            batch_size - Number of images to generate
+        Outputs:
+            x_samples - Sampled, binarized images with 0s and 1s
+            x_mean - The sigmoid output of the decoder with continuous values
+                     between 0 and 1 from which we obtain "x_samples"
+        """
+        z = torch.randn((batch_size, self.z_dim)).to(self.device)
+        x_mean = torch.sigmoid(self.decoder(z))
+        x_samples = torch.bernoulli(x_mean)
+        return x_samples, x_mean
+
+    @property
+    def shape(self):
+        return self.input_dim
 
 class RNNModel(nn.Module):
     """
