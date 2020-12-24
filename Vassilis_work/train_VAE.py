@@ -32,7 +32,7 @@ def sample_and_save(model, epoch, batch_size=64):
     sample = model.sample(batch_size).to('cpu')
     for s in sample:
         plt.plot(range(len(s)), s)
-    plt.savefig(f"images/sample {epoch}", dpi=2000)
+    plt.savefig(f"images/sample {epoch}", figsize=(10,40) dpi=500)
     plt.close()
 
 def train(config):
@@ -103,7 +103,7 @@ def train(config):
             plt.plot(range(len(loss_graph)), loss_graph_rec, label='reconstruction')
             plt.plot(range(len(loss_graph)), loss_graph_reg, label='regularization')
             plt.legend()
-            plt.savefig(f"images/loss", dpi=2000)
+            plt.savefig(f"images/loss", figsize=(10,40) dpi=500)
             plt.close()
 
             out = out.cpu().detach().numpy()
@@ -114,7 +114,7 @@ def train(config):
             plt.plot(range(batch_inputs.shape[1]), batch_inputs[0], label="raw")
             plt.plot(range(batch_targets.shape[1]), batch_targets[0], label='manualy')
             plt.legend()
-            plt.savefig(f"images/epoch {epoch}", dpi=2000)
+            plt.savefig(f"images/epoch {epoch}", figsize=(10,40) dpi=500)
             plt.close()
 
             sample_and_save(model, epoch, 4)
