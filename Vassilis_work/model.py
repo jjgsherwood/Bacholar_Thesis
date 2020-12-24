@@ -15,8 +15,9 @@ class VAEModel(nn.Module):
         """
         super().__init__()
         print(kwargs)
-        for k,v in kwargs:
-            setattr(self, k, v)
+        for k in kwargs:
+            print(k)
+            # setattr(self, k, v)
 
         if model_name == 'MLP':
             self.encoder = MLPEncoder(self.input_dim, self.hidden_dims, self.z_dim)

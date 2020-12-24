@@ -23,11 +23,11 @@ def train(config):
     # Initialize the dataset and data loader (note the +1)
     dataset = RamanDataset(config.seq_length, config.mode, config.folder)
     data_loader = DataLoader(dataset, config.batch_size, shuffle=True)
-    print(dataset.shape)
+
     # Initialize the model that we are going to use
     parameters = {
         'device': device,
-        'input_dim': dataset.shape,
+        'input_dim': dataset.sequence_len,
         'hidden_dims': [512, 256]
     }
 

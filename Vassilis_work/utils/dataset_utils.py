@@ -88,6 +88,10 @@ class RamanDataset(data.Dataset):
     def shape(self):
         return self._shape
 
+    @property
+    def sequence_len(self):
+        return self._shape[0,2]
+
     def __getitem__(self, index):
         # check the index is not on the split
         return self._data[index], np.concatenate([x[index] for x in self._target])
