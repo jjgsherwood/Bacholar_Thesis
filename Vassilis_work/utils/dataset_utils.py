@@ -90,7 +90,7 @@ class RamanDataset(data.Dataset):
 
     @property
     def sequence_len(self):
-        return self._shape[0,2]
+        return self._shape[0][2]
 
     def __getitem__(self, index):
         # check the index is not on the split
