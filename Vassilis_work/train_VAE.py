@@ -39,8 +39,10 @@ def train(config):
     loss_function = LogCoshLoss()
     # loss_function = nn.MSELoss()
     print("start training")
+    loss_graph = []
 
     for epoch in range(config.epochs):
+        loss_graph_tmp = 0
         for batch_inputs, batch_targets in tqdm(data_loader, desc=f"Training epoch {epoch}", leave=False, position=0):
             # Move to GPU
             batch_inputs = batch_inputs.to(device)
@@ -59,7 +61,14 @@ def train(config):
                                            max_norm=config.max_norm)
 
             optimizer.step()
-            print(loss)
+
+            loss_graph_tmp += loss
+
+        plt.figure()
+        loss_graph.append(loss_graph_tmp / epoch)
+        plt.plot(range(len(loss_graph)), loss_graph)
+        plt.savefig(f"loss")
+        plt.close()
 
         out = out.cpu().detach().numpy()
         batch_inputs = batch_inputs.cpu().detach().numpy()
