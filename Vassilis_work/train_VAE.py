@@ -40,9 +40,14 @@ def train(config):
     # loss_function = nn.MSELoss()
     print("start training")
     loss_graph = []
+    loss_graph_rec = []
+    loss_graph_reg = []
 
     for epoch in range(config.epochs):
         loss_graph_tmp = 0
+        loss_graph_reg_tmp = 0
+        loss_graph_rec_tmp = 0
+
         for batch_inputs, batch_targets in tqdm(data_loader, desc=f"Training epoch {epoch}", leave=False, position=0):
             # Move to GPU
             batch_inputs = batch_inputs.to(device)
@@ -54,7 +59,8 @@ def train(config):
             mean, log_std, out = model(batch_inputs)
 
             # Compute the loss, gradients and update network parameters
-            loss = loss_function(out.float(), batch_inputs.float()) + KLD(mean, log_std).mean()
+            rec_loss, reg_loss = loss_function(out.float(), batch_inputs.float()), KLD(mean, log_std).mean()
+            loss = rec_loss + reg_loss
             loss.backward()
 
             torch.nn.utils.clip_grad_norm_(model.parameters(),
@@ -63,11 +69,19 @@ def train(config):
             optimizer.step()
 
             loss_graph_tmp += loss
+            loss_graph_reg_tmp += reg_loss
+            loss_graph_rec_tmp += rec_loss
+
+        loss_graph.append(loss_graph_tmp / epoch)
+        loss_graph_rec.append(loss_graph_rec_tmp / epoch)
+        loss_graph_reg.append(loss_graph_reg_tmp / epoch)
 
         if not epoch % 5:
             plt.figure()
-            loss_graph.append(loss_graph_tmp / epoch)
-            plt.plot(range(len(loss_graph)), loss_graph)
+            plt.plot(range(len(loss_graph)), loss_graph, label='total')
+            plt.plot(range(len(loss_graph)), loss_graph_rec, label='reconstruction')
+            plt.plot(range(len(loss_graph)), loss_graph_reg, label='regularization')
+            plt.legend()
             plt.savefig(f"images/loss", dpi=500)
             plt.close()
 
