@@ -52,8 +52,9 @@ def train(config):
 
     # Setup the loss and optimizer
     optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
-    loss_function = LogCoshLoss()
-    # loss_function = nn.MSELoss()
+    # loss_function = LogCoshLoss()
+    loss_function = nn.MSELoss('none')
+
     print("start training")
     loss_graph = []
     loss_graph_rec = []
@@ -75,7 +76,7 @@ def train(config):
             mean, log_std, out = model(batch_inputs)
 
             # Compute the loss, gradients and update network parameters
-            rec_loss, reg_loss = loss_function(out.float(), batch_inputs.float()), KLD(mean, log_std).mean()
+            rec_loss, reg_loss = loss_function(out.float(), batch_inputs.float()).sum(1).mean(0), KLD(mean, log_std).mean()
             loss = rec_loss + reg_loss
             loss.backward()
 
