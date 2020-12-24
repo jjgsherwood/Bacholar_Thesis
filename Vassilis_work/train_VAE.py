@@ -27,12 +27,11 @@ def sample_and_save(model, epoch, batch_size=64):
         summary_writer - A TensorBoard summary writer to log the image samples.
         batch_size - Number of images to generate/sample
     """
-    plt.figure()
-
+    plt.figure(figsize=(10,40), dpi=500)
     sample = model.sample(batch_size).to('cpu')
     for s in sample:
         plt.plot(range(len(s)), s)
-    plt.savefig(f"images/sample {epoch}", figsize=(10,40), dpi=500)
+    plt.savefig(f"images/sample {epoch}")
     plt.close()
 
 def train(config):
@@ -98,23 +97,23 @@ def train(config):
         loss_graph_reg.append(loss_graph_reg_tmp / epoch)
 
         if not epoch % 5:
-            plt.figure()
+            plt.figure(figsize=(10,40), dpi=500)
             plt.plot(range(len(loss_graph)), loss_graph, label='total')
             plt.plot(range(len(loss_graph)), loss_graph_rec, label='reconstruction')
             plt.plot(range(len(loss_graph)), loss_graph_reg, label='regularization')
             plt.legend()
-            plt.savefig(f"images/loss", figsize=(10,40), dpi=500)
+            plt.savefig(f"images/loss")
             plt.close()
 
             out = out.cpu().detach().numpy()
             batch_inputs = batch_inputs.cpu().detach().numpy()
             batch_targets = batch_targets.cpu().detach().numpy()
-            plt.figure()
+            plt.figure(figsize=(10,40), dpi=500)
             plt.plot(range(out.shape[1]), out[0], label="LSTM")
             plt.plot(range(batch_inputs.shape[1]), batch_inputs[0], label="raw")
             plt.plot(range(batch_targets.shape[1]), batch_targets[0], label='manualy')
             plt.legend()
-            plt.savefig(f"images/epoch {epoch}", figsize=(10,40), dpi=500)
+            plt.savefig(f"images/epoch {epoch}")
             plt.close()
 
             sample_and_save(model, epoch, 4)
