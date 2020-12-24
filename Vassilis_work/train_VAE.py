@@ -43,7 +43,7 @@ def train(config):
     for i in range(config.epochs):
         # Only for time measurement of step through network
         t1 = time.time()
-        for batch_inputs, batch_targets in tqdm(train_loader, desc=f"Training epoch {epoch}", leave=False, position=0):
+        for batch_inputs, batch_targets in tqdm(data_loader, desc=f"Training epoch {epoch}", leave=False, position=0):
             # Move to GPU
             batch_inputs = batch_inputs.to(device)
             batch_targets = batch_targets.to(device)
