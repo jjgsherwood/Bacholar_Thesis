@@ -49,17 +49,6 @@ class VAEModel(nn.Module):
         z = torch.randn((batch_size, self.z_dim)).to(self.device)
         return self.decoder(z)
 
-    @property
-    def shape(self):
-        return self.input_dim
-
-    @property
-    def device(self):
-        """
-        Property function to get the device on which the model is.
-        """
-        return self.device
-
 class RNNModel(nn.Module):
     """
     Smoothing RNN
