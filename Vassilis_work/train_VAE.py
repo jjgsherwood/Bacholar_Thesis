@@ -11,9 +11,25 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+from torchvision.utils import make_grid, save_image
 
 from utils import *
 from model import *
+
+def sample_and_save(model, epoch, batch_size=64):
+    """
+    Function that generates and saves samples from the VAE.  The generated
+    samples and mean images should be saved, and can eventually be added to a
+    TensorBoard logger if wanted.
+    Inputs:
+        model - The VAE model that is currently being trained.
+        epoch - The epoch number to use for TensorBoard logging and saving of the files.
+        summary_writer - A TensorBoard summary writer to log the image samples.
+        batch_size - Number of images to generate/sample
+    """
+    sample, _ = model.sample(batch_size)
+    grid = make_grid(sample.cpu(), nrow=8)
+    save_image(grid, os.path.join('images', f'sample_{epoch}.png'))
 
 def train(config):
     # Initialize the device which to run the model on
@@ -96,6 +112,8 @@ def train(config):
             plt.savefig(f"images/epoch {epoch}", dpi=500)
             plt.close()
 
+            sample_and_save(model, epoch, 64)
+
     print('Done training.')
 
 if __name__ == "__main__":
@@ -121,7 +139,7 @@ if __name__ == "__main__":
     parser.add_argument('--learning_rate', type=float, default=1e-5,
                         help='Learning rate')
 
-    parser.add_argument('--epochs', type=int, default=int(100),
+    parser.add_argument('--epochs', type=int, default=int(250),
                         help='Number of training epochs')
     parser.add_argument('--max_norm', type=float, default=5.0, help='--')
 
